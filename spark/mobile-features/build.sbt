@@ -1,6 +1,6 @@
 name := "mobile-features"
 
-version := "0.5"
+version := "1.1"
 
 scalaVersion := "2.12.15"
 val sparkVersion = "3.2.0"
