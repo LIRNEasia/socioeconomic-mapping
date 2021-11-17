@@ -51,9 +51,12 @@ object CalculateSocialFeatures {
         .agg(sum(col("SOCIAL_ENTROPY_TERM")).as("SOCIAL_ENTROPY"))
 
     // Write the results to disk
-    interactionPerContact
-      .join(contactCount, Seq("SUBSCRIBER_ID"), "inner")
-      .join(socialEntropy, Seq("SUBSCRIBER_ID"), "inner")
+    filteredData
+      .select(col("SUBSCRIBER_ID"))
+      .distinct
+      .join(interactionPerContact, Seq("SUBSCRIBER_ID"), "left")
+      .join(contactCount, Seq("SUBSCRIBER_ID"), "left")
+      .join(socialEntropy, Seq("SUBSCRIBER_ID"), "left")
       .write
       .parquet(hdfsUrl + "/results/viren_socioeconomic_mapping/social_features_" + startDate + "_" + endDate)
   }

@@ -36,17 +36,22 @@ object CalculateUsageFeatures {
           count("*").as("INCOMING_CALL_COUNT"),
           mean(col("CALL_DURATION")).as("AVG_INCOMING_CALL_DURATION"))
 
-    val usageFeatures =
+    val generalFeatures =
       filteredData
         .groupBy(col("SUBSCRIBER_ID"))
         .agg(
           count("*").as("CALL_COUNT"),
           mean(col("CALL_DURATION")).as("AVG_CALL_DURATION"))
-        .join(nighttimeFeatures, Seq("SUBSCRIBER_ID"))
-        .join(incomingFeatures, Seq("SUBSCRIBER_ID"))
+        .join(nighttimeFeatures, Seq("SUBSCRIBER_ID"), "left")
+        .join(incomingFeatures, Seq("SUBSCRIBER_ID"), "left")
 
     // Write the results to disk
-    usageFeatures
+    filteredData
+      .select(col("SUBSCRIBER_ID"))
+      .distinct
+      .join(generalFeatures, Seq("SUBSCRIBER_ID"), "left")
+      .join(nighttimeFeatures, Seq("SUBSCRIBER_ID"), "left")
+      .join(incomingFeatures, Seq("SUBSCRIBER_ID"), "left")
       .write
       .parquet(hdfsUrl + "/results/viren_socioeconomic_mapping/usage_features_" + startDate + "_" + endDate)
   }

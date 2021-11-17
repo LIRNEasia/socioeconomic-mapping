@@ -82,10 +82,13 @@ object CalculateMobilityFeatures {
         .agg(sum(col("SPATIAL_ENTROPY_TERM")).as("SPATIAL_ENTROPY"))
 
     // Write the results to disk
-    homeTower
-      .join(radiusOfGyration, Seq("SUBSCRIBER_ID"), "inner")
-      .join(uniqueTowerCount, Seq("SUBSCRIBER_ID"), "inner")
-      .join(spatialEntropy, Seq("SUBSCRIBER_ID"), "inner")
+    filteredData
+      .select(col("SUBSCRIBER_ID"))
+      .distinct
+      .join(homeTower, Seq("SUBSCRIBER_ID"), "left")
+      .join(radiusOfGyration, Seq("SUBSCRIBER_ID"), "left")
+      .join(uniqueTowerCount, Seq("SUBSCRIBER_ID"), "left")
+      .join(spatialEntropy, Seq("SUBSCRIBER_ID"), "left")
       .write
       .parquet(hdfsUrl + "/results/viren_socioeconomic_mapping/mobility_features_" + startDate + "_" + endDate)
   }
