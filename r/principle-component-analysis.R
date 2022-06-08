@@ -59,6 +59,28 @@ pca_census <- preProcess(
 
 predict(pca_census, census_data) %>% write_csv("results/pca_census.csv")
 
+## Mobile data
+pca_mobile <- preProcess(
+  x = mobile_data %>% select(-gnd_id),
+  method = "pca",
+  pcaComp = 1
+)
+
+predict(pca_mobile, mobile_data) %>% write_csv("results/pca_mobile.csv")
+
+## Satellite data
+pca_satellite <- preProcess(
+  x = satellite_data %>% select(-gnd_id),
+  method = "pca",
+  pcaComp = 1
+)
+
+predict(
+  pca_satellite, 
+  satellite_data
+) %>% 
+  write_csv("results/pca_satellite.csv")
+
 ## Mobile and satellite data
 pca_mobile_satellite <- preProcess(
   x = left_join(mobile_data, satellite_data, by = "gnd_id") %>% select(-gnd_id),
